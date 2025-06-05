@@ -7,7 +7,7 @@ import re
 st.set_page_config(layout="wide")
 st.title("Excel გენერატორი")
 
-# გაფართოებული ვიზუალი
+# გაფართოების CSS ჰაკი
 st.markdown("""
     <style>
         .main { max-width: 95%; padding-left: 2rem; padding-right: 2rem; }
@@ -72,17 +72,17 @@ if report_file and statement_file:
     wb.save(output)
     output.seek(0)
 
+    # მთავარი ხედის ან დეტალების ჩვენება
     if 'selected_company' not in st.session_state:
         st.subheader("📋 კომპანიების ჩამონათვალი")
 
         for name, company_id, invoice_sum in company_summaries:
             col1, col2, col3, col4, col5 = st.columns([2, 2, 1.5, 1.5, 1.5])
             with col1:
-                if st.button(f"{name}", key=f"name_{company_id}"):
-                    st.session_state['selected_company'] = name
+                st.markdown(name)
             with col2:
                 if st.button(f"{company_id}", key=f"id_{company_id}"):
-                    st.session_state['selected_company'] = name
+                    st.session_state['selected_company'] = company_id
 
             paid_sum = bank_df[bank_df["P"] == str(company_id)]["Amount"].sum()
             difference = invoice_sum - paid_sum
@@ -95,44 +95,18 @@ if report_file and statement_file:
                 st.write(f"{difference:,.2f}")
 
     else:
-        selected_name = st.session_state['selected_company']
-        st.subheader(f"🔎 {selected_name} - ანგარიშფაქტურები")
-
-        report_file.seek(0)
+        selected_code = st.session_state['selected_company']
         df_full = pd.read_excel(report_file, sheet_name='Grid')
         df_full['დასახელება'] = df_full['გამყიდველი'].astype(str).apply(lambda x: re.sub(r'^\(\d+\)\s*', '', x).strip())
-        matching_df = df_full[df_full['დასახელება'].str.contains(selected_name, na=False)].copy()
-        matching_df['რაოდ.'] = matching_df['რაოდ.'].fillna(1)
+        df_full['საიდენტიფიკაციო კოდი'] = df_full['გამყიდველი'].apply(lambda x: ''.join(re.findall(r'\d', str(x)))[:11])
+        matching_df = df_full[df_full['საიდენტიფიკაციო კოდი'] == selected_code]
 
         if not matching_df.empty:
-            st.subheader("🧮 ინვოისის გადათვლა - ახალი ფასებით")
+            company_name = matching_df['დასახელება'].iloc[0]
+            st.subheader(f"🔎 ({selected_code}) {company_name} - ანგარიშფაქტურები")
+            st.dataframe(matching_df, use_container_width=True)
 
-            if 'new_prices' not in st.session_state:
-                st.session_state.new_prices = {}
-
-            total = 0
-            for i, row in matching_df.iterrows():
-                col1, col2, col3, col4, col5 = st.columns([4, 2, 1, 2, 2])
-                with col1:
-                    st.markdown(row['საქონელი / მომსახურება'])
-                with col2:
-                    st.markdown(row['ზომის ერთეული'])
-                with col3:
-                    qty = row['რაოდ.'] or 1
-                    st.markdown(str(qty))
-                with col4:
-                    key = f"new_price_{i}"
-                    new_price = st.number_input("ახალი ფასი", value=st.session_state.new_prices.get(key, 0.0), key=key, format="%.2f")
-                    st.session_state.new_prices[key] = new_price
-                with col5:
-                    use_price = new_price if new_price > 0 else row['ღირებულება დღგ და აქციზის ჩათვლით']
-                    item_total = qty * use_price
-                    st.markdown(f"**{item_total:.2f} ₾**")
-                    total += item_total
-
-            st.markdown("---")
-            st.subheader(f"📊 ჯამი: **{total:.2f} ₾**")
-
+            # საძიებო ველი
             st.subheader("🔍 მოძებნე გუგლში მასალა ან მომსახურება")
             col1, col2 = st.columns([3, 1])
             with col1:
@@ -145,11 +119,11 @@ if report_file and statement_file:
                     else:
                         st.warning("გთხოვ ჩაწერე ტექსტი ძებნამდე.")
 
-            # Excel ჩამოტვირთვა
+            # Excel ფაილის ჩამოტვირთვა
             company_output = io.BytesIO()
             company_wb = Workbook()
             ws = company_wb.active
-            ws.title = selected_name[:31]
+            ws.title = company_name[:31]
             ws.append(matching_df.columns.tolist())
             for row in matching_df.itertuples(index=False):
                 ws.append(row)
@@ -157,14 +131,13 @@ if report_file and statement_file:
             company_output.seek(0)
 
             st.download_button(
-                label=f"⬇️ ჩამოტვირთე {selected_name} ინვოისების Excel",
+                label=f"⬇️ ჩამოტვირთე {company_name} ინვოისების Excel",
                 data=company_output,
-                file_name=f"{selected_name}_ინვოისები.xlsx",
+                file_name=f"{company_name}_ინვოისები.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
-
         else:
-            st.warning("📭 ჩანაწერი ვერ მოიძებნა ამ კომპანიისთვის.")
+            st.warning("📭 ჩანაწერი ვერ მოიძებნა ამ კომპანიაზე.")
 
         if st.button("⬅️ დაბრუნება სრულ სიაზე"):
             del st.session_state['selected_company']
