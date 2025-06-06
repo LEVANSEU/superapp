@@ -69,26 +69,6 @@ st.markdown("""
 st.title("Excel გენერატორი")
 
 
-
-# შავი ღილაკები და ტექსტები გადავიყვანეთ თეთრ ფონზე
-st.markdown("""
-    <style>
-        .stSelectbox > div, .stRadio > div, .stTextInput > div, .stButton > div {
-            background-color: #f5f5f5 !important;
-        }
-        .stSelectbox > div *,
-        .stRadio > div *,
-        .stTextInput > div * {
-            color: #222 !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
-.stRadio div[role="radiogroup"] label span {
-            font-weight: bold !important;
-        }
-
-
 report_file = st.file_uploader("ატვირთე ანგარიშფაქტურების ფაილი (report.xlsx)", type=["xlsx"])
 statement_file = st.file_uploader("ატვირთე საბანკო ამონაწერის ფაილი (statement.xlsx)", type=["xlsx"])
 
