@@ -14,7 +14,7 @@ st.markdown("""
         .block-container { padding-top: 1rem; padding-bottom: 1rem; }
         button[kind="secondary"] { width: 100%; }
         .number-cell { text-align: right !important; font-variant-numeric: tabular-nums; padding-right: 1rem; }
-        .summary-header { display: flex; font-weight: bold; margin-top: 1em; padding-bottom: 0.5rem; border-bottom: 1px solid #555; }
+        .summary-header { display: flex; font-weight: bold; margin-top: 1em; padding-bottom: 0.5rem; border-bottom: 1px solid #555; text-align: center; }
         .summary-header div { padding-left: 0.5rem; }
     </style>
 """, unsafe_allow_html=True)
@@ -58,10 +58,17 @@ if report_file and statement_file:
         st.subheader("📋 კომპანიების ჩამონათვალი")
 
         search_code = st.text_input("🔎 ჩაწერე საიდენტიფიკაციო კოდი:", "")
+        sort_column = st.selectbox("📊 დალაგების ველი", ["ინვოისების ჯამი", "ჩარიცხვა", "სხვაობა"])
+        sort_order = st.radio("⬆️⬇️ დალაგების ტიპი", ["ზრდადობით", "კლებადობით"], horizontal=True)
+
+        sort_index = {"ინვოისების ჯამი": 2, "ჩარიცხვა": 3, "სხვაობა": 4}[sort_column]
+        reverse = sort_order == "კლებადობით"
 
         filtered_summaries = company_summaries
         if search_code.strip():
             filtered_summaries = [item for item in company_summaries if item[1] == search_code.strip()]
+
+        filtered_summaries = sorted(filtered_summaries, key=lambda x: x[sort_index], reverse=reverse)
 
         st.markdown("""
         <div class='summary-header'>
