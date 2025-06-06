@@ -10,14 +10,51 @@ st.title("Excel გენერატორი")
 # გაფართოების სტილი
 st.markdown("""
     <style>
-        .main { max-width: 95%; padding-left: 2rem; padding-right: 2rem; }
-        .block-container { padding-top: 1rem; padding-bottom: 1rem; }
-        button[kind="secondary"] { width: 100%; }
-        .number-cell { text-align: right !important; font-variant-numeric: tabular-nums; padding-right: 1rem; }
-        .summary-header { display: flex; font-weight: bold; margin-top: 1em; padding-bottom: 0.5rem; border-bottom: 1px solid #555; text-align: center; }
-        .summary-header div { padding-left: 0.5rem; }
+        body, .main, .block-container {
+            background-color: white !important;
+            color: #333333;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .stFileUploader, .stTextInput, .stSelectbox, .stRadio, .stButton, .stDataFrame {
+            background-color: #f5f5f5 !important;
+            border-radius: 10px;
+            padding: 8px;
+        }
+        .stButton>button {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+        }
+        .stButton>button:hover {
+            background-color: #45a049;
+        }
+        .summary-header {
+            display: flex;
+            font-weight: bold;
+            margin-top: 1em;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #999;
+            text-align: center;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+        }
+        .summary-header div {
+            flex: 1;
+            padding: 0.5rem;
+        }
+        .number-cell {
+            text-align: right !important;
+            font-variant-numeric: tabular-nums;
+            padding-right: 1rem;
+            font-weight: bold;
+            color: #222;
+        }
     </style>
 """, unsafe_allow_html=True)
+
 
 report_file = st.file_uploader("ატვირთე ანგარიშფაქტურების ფაილი (report.xlsx)", type=["xlsx"])
 statement_file = st.file_uploader("ატვირთე საბანკო ამონაწერის ფაილი (statement.xlsx)", type=["xlsx"])
