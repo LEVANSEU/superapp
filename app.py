@@ -66,16 +66,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ასატვირთი ფაილები ორ სვეტად
-col1, col2 = st.columns([1, 1])
-with col1:
-    report_file = st.file_uploader("📄 ატვირთე ანგარიშფაქტურების ფაილი (report.xlsx)", type=["xlsx"])
-with col2:
-    statement_file = st.file_uploader("📄 ატვირთე საბანკო ამონაწერის ფაილი (statement.xlsx)", type=["xlsx"])
-
-
-
-
 report_file = st.file_uploader("ატვირთე ანგარიშფაქტურების ფაილი (report.xlsx)", type=["xlsx"])
 statement_file = st.file_uploader("ატვირთე საბანკო ამონაწერის ფაილი (statement.xlsx)", type=["xlsx"])
 
