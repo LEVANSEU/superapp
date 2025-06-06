@@ -15,12 +15,12 @@ st.markdown("""
             color: #222 !important;
             font-family: 'Segoe UI', sans-serif;
         }
-        .stFileUploader, .stTextInput, .stSelectbox, .stRadio, .stButton, .stDataFrame {
+        .stFileUploader, .stTextInput, .stSelectbox, .stRadio, .stButton, .stDataFrame,
+        .stTextInput input, .stSelectbox div[data-baseweb="select"], .stRadio div[role="radiogroup"] label {
             background-color: #f5f5f5 !important;
-            border-radius: 10px;
-            padding: 4px 8px !important;
-            font-size: 14px !important;
             color: #222 !important;
+            border-radius: 10px;
+            font-size: 14px !important;
         }
         .stFileUploader {
             max-width: 600px !important;
