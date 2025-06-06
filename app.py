@@ -12,7 +12,7 @@ st.markdown("""
     <style>
         body, .main, .block-container {
             background-color: white !important;
-            color: #333333;
+            color: #222 !important;
             font-family: 'Segoe UI', sans-serif;
         }
         .stFileUploader, .stTextInput, .stSelectbox, .stRadio, .stButton, .stDataFrame {
@@ -20,6 +20,7 @@ st.markdown("""
             border-radius: 10px;
             padding: 4px 8px !important;
             font-size: 14px !important;
+            color: #222 !important;
         }
         .stFileUploader {
             max-width: 600px !important;
@@ -27,7 +28,7 @@ st.markdown("""
         }
         .stButton>button {
             background-color: #4CAF50;
-            color: white;
+            color: white !important;
             font-weight: bold;
             border: none;
             border-radius: 8px;
@@ -46,6 +47,7 @@ st.markdown("""
             text-align: center;
             background-color: #f0f0f0;
             border-radius: 8px;
+            color: #222 !important;
         }
         .summary-header div {
             flex: 1;
@@ -60,6 +62,7 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
+
 
 
 report_file = st.file_uploader("ატვირთე ანგარიშფაქტურების ფაილი (report.xlsx)", type=["xlsx"])
