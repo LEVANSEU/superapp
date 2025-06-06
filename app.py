@@ -7,7 +7,7 @@ import re
 st.set_page_config(layout="wide")
 st.title("Excel გენერატორი")
 
-# გაფართოების CSS ჰაკი
+# გაფართოების სტილი
 st.markdown("""
     <style>
         .main { max-width: 95%; padding-left: 2rem; padding-right: 2rem; }
@@ -50,43 +50,36 @@ if report_file and statement_file:
 
         company_summaries.append((company_name, company_id, company_invoice_sum))
 
-    for sheet_title, content_df in [
-        ("დეტალური მონაცემები", purchases_df),
-        ("საბანკოამონაწერი", bank_df),
-        ("ანგარიშფაქტურის დეტალები", purchases_df[['სერია №', 'საქონელი / მომსახურება', 'ზომის ერთეული', 'რაოდ.', 'ღირებულება დღგ და აქციზის ჩათვლით']].rename(columns={'სერია №': 'ინვოისის №'})),
-        ("გადარიცხვები_უბმოლოდ", bank_df[~bank_df['P'].isin(purchases_df['საიდენტიფიკაციო კოდი'])]),
-        ("განახლებული ამონაწერი", bank_df),
-    ]:
-        ws = wb.create_sheet(title=sheet_title)
-        ws.append(content_df.columns.tolist())
-        for row in content_df.itertuples(index=False):
-            ws.append(row)
-
-    ws7 = wb.create_sheet(title="კომპანიების_ჯამები")
-    ws7.append(['დასახელება', 'საიდენტიფიკაციო კოდი', 'ანგარიშფაქტურების ჯამი', 'ჩარიცხული თანხა'])
-    for idx, (company_name, company_id, invoice_sum) in enumerate(company_summaries, start=2):
-        payment_formula = f"=SUMIF(საბანკოამონაწერი!P:P, B{idx}, საბანკოამონაწერი!D:D)"
-        ws7.append([company_name, company_id, invoice_sum, payment_formula])
-
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
 
-    # მთავარი ხედის ან დეტალების ჩვენება
+    # -----------------------------
+    # მთავარი ხედის ჩვენება
+    # -----------------------------
     if 'selected_company' not in st.session_state:
         st.subheader("📋 კომპანიების ჩამონათვალი")
 
-        for name, company_id, invoice_sum in company_summaries:
+        # 🔍 საძიებო ველი
+        search_code = st.text_input("🔎 ჩაწერე საიდენტიფიკაციო კოდი:", "")
+
+        # გაფილტრული სია
+        filtered_summaries = company_summaries
+        if search_code.strip():
+            filtered_summaries = [item for item in company_summaries if item[1] == search_code.strip()]
+
+        # სათაურები
+        st.markdown("**დასახელება | საიდენტიფიკაციო კოდი | ინვოისების ჯამი | ჩარიცხვა | სხვაობა**")
+
+        for name, company_id, invoice_sum in filtered_summaries:
             col1, col2, col3, col4, col5 = st.columns([2, 2, 1.5, 1.5, 1.5])
             with col1:
                 st.markdown(name)
             with col2:
                 if st.button(f"{company_id}", key=f"id_{company_id}"):
                     st.session_state['selected_company'] = company_id
-
             paid_sum = bank_df[bank_df["P"] == str(company_id)]["Amount"].sum()
             difference = invoice_sum - paid_sum
-
             with col3:
                 st.write(f"{invoice_sum:,.2f}")
             with col4:
@@ -94,6 +87,9 @@ if report_file and statement_file:
             with col5:
                 st.write(f"{difference:,.2f}")
 
+    # -----------------------------
+    # არჩეული კომპანიის ხედის ჩვენება
+    # -----------------------------
     else:
         selected_code = st.session_state['selected_company']
         df_full = pd.read_excel(report_file, sheet_name='Grid')
@@ -119,7 +115,7 @@ if report_file and statement_file:
                     else:
                         st.warning("გთხოვ ჩაწერე ტექსტი ძებნამდე.")
 
-            # Excel ფაილის ჩამოტვირთვა
+            # Excel ჩამოტვირთვა
             company_output = io.BytesIO()
             company_wb = Workbook()
             ws = company_wb.active
@@ -136,12 +132,14 @@ if report_file and statement_file:
                 file_name=f"{company_name}_ინვოისები.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
+
         else:
-            st.warning("📭 ჩანაწერი ვერ მოიძებნა ამ კომპანიაზე.")
+            st.warning("📭 ჩანაწერი ვერ მოიძებნა ამ კომპანიისთვის.")
 
         if st.button("⬅️ დაბრუნება სრულ სიაზე"):
             del st.session_state['selected_company']
 
+    # საერთო ფაილის ჩამოტვირთვა
     st.success("✅ ფაილი მზადაა! ჩამოტვირთე აქედან:")
     st.download_button(
         label="⬇️ ჩამოტვირთე Excel ფაილი",
