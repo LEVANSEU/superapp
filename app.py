@@ -16,7 +16,10 @@ st.markdown("""
             font-family: 'Segoe UI', sans-serif;
         }
         .stFileUploader, .stTextInput, .stSelectbox, .stRadio, .stButton, .stDataFrame,
-        .stTextInput input, .stSelectbox div[data-baseweb="select"], .stRadio div[role="radiogroup"] label {
+        .stTextInput input, .stSelectbox div[data-baseweb="select"],
+        .stSelectbox div[data-baseweb="select"] *,
+        .stRadio div[role="radiogroup"] label,
+        .stRadio div[role="radiogroup"] label * {
             background-color: #f5f5f5 !important;
             color: #222 !important;
             border-radius: 10px;
@@ -69,6 +72,7 @@ with col1:
     report_file = st.file_uploader("📄 ატვირთე ანგარიშფაქტურების ფაილი (report.xlsx)", type=["xlsx"])
 with col2:
     statement_file = st.file_uploader("📄 ატვირთე საბანკო ამონაწერის ფაილი (statement.xlsx)", type=["xlsx"])
+
 
 
 
