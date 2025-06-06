@@ -18,7 +18,12 @@ st.markdown("""
         .stFileUploader, .stTextInput, .stSelectbox, .stRadio, .stButton, .stDataFrame {
             background-color: #f5f5f5 !important;
             border-radius: 10px;
-            padding: 8px;
+            padding: 4px 8px !important;
+            font-size: 14px !important;
+        }
+        .stFileUploader {
+            max-width: 600px !important;
+            margin: 0 auto !important;
         }
         .stButton>button {
             background-color: #4CAF50;
@@ -26,7 +31,8 @@ st.markdown("""
             font-weight: bold;
             border: none;
             border-radius: 8px;
-            padding: 8px 16px;
+            padding: 6px 14px;
+            font-size: 14px;
         }
         .stButton>button:hover {
             background-color: #45a049;
